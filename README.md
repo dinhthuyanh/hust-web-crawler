@@ -19,7 +19,6 @@ Dự án được chia thành các phần công việc chính:
 - Apache Lucene (Java): indexing và search — phần cần tích hợp tiếp theo.
 
 ## 3. Cấu trúc repository
-
 hust-web-crawler/
 ├── app.py
 ├── crawler_hust.py
