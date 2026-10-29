@@ -1,35 +1,21 @@
-
-# Python
+# Python environments and bytecode
 .venv/
 venv/
 __pycache__/
 *.py[cod]
 
-# macOS
+# Local IDE / agent settings
+.idea/
+.claude/
+.agents/
 .DS_Store
-
-# Logs and runtime files
-*.log
-data/crawler_app.pid
-data/crawl_state.tmp
 
 # Secrets
 .env
 .env.*
 
-# Java / Maven build artifacts
-target/
-
-# Crawled data and generated outputs
-data/*
-!data/.gitkeep
-.claude
-.agents
-.idea/*
-index
-/index
-/index/
+# Generated logs, crawl data, Lucene indexes and Maven builds
+*.log
 /data/
-/.idea/
-/hust-web-crawler/index/*
-/searcher/index
+**/index/
+**/target/

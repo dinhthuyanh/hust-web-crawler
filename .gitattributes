@@ -1,2 +1,1 @@
-data/content.jsonl filter=lfs diff=lfs merge=lfs -text
-data/link_graph.csv filter=lfs diff=lfs merge=lfs -text
+# Crawl data and Lucene indexes are local-only; see .gitignore.
