@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="vi">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>HUST · Quản lý crawler</title><link rel="stylesheet" href="/styles.css"><script src="/crawler.js" defer></script></head>
+<body>
+<header class="topbar"><a class="brand" href="/"><span class="brand-mark">H</span><span>HUST <strong>Discovery</strong></span></a><nav><a href="/">Tìm kiếm →</a></nav></header>
+<main class="dashboard">
+<section class="intro"><p class="eyebrow">KHÔNG GIAN THU THẬP DỮ LIỆU</p><h1>Tổng quan crawler</h1><p class="lead">Theo dõi tiến độ, kiểm tra URL và quản lý phiên thu thập.</p></section>
+<section class="control-panel"><div><strong id="crawler-status">Đang kết nối…</strong><p class="help" id="updated-at"></p></div><div class="actions"><button id="start" type="button">Bắt đầu</button><button id="stop" type="button" class="secondary">Dừng an toàn</button><button id="refresh" type="button" class="secondary">Làm mới</button></div></section>
+<p id="crawler-message" role="status" aria-live="polite" hidden></p>
+<section class="metrics" aria-label="Thống kê"><article><span>Đã xử lý</span><strong id="processed">—</strong></article><article><span>Giữ lại</span><strong id="kept">—</strong></article><article><span>Đang chờ</span><strong id="pending">—</strong></article><article><span>Bị loại</span><strong id="dropped">—</strong></article></section>
+<section class="search-panel"><h2>Tiến độ thu thập</h2><progress id="progress" value="0" max="1" aria-label="Tiến độ xử lý URL"></progress><p class="help" id="progress-label"></p><p class="help">Hàng đợi có thể tăng khi phát hiện URL mới. Số liệu được crawler xuất mỗi 100 URL hoặc khi dừng.</p></section>
+<section class="chart-grid"><article class="search-panel"><h2>Quyết định crawler</h2><div id="decisions-chart"></div></article><article class="search-panel"><h2>Mã HTTP</h2><div id="statuses-chart"></div></article></section>
+<section class="search-panel"><div class="results-heading"><h2>Danh sách URL</h2><a id="export" href="/api/crawler/export" download="hust_saved_urls.csv">Tải CSV đang lọc ↓</a></div>
+<form id="filter-form" class="options"><label>Quyết định<select id="decision"><option value="">Tất cả</option><option>KEEP</option><option>DROP</option></select></label><label>Loại<select id="type"><option value="">Tất cả</option></select></label><label>Tìm URL / tiêu đề<input id="filter-query" type="search" placeholder="Nhập từ khóa…"></label><button type="submit">Lọc URL</button></form>
+<p id="links-meta" class="help" aria-live="polite"></p><div class="table-scroll"><table><thead><tr><th>URL</th><th>HTTP</th><th>Loại</th><th>Tiêu đề</th><th>Quyết định</th><th>Lý do</th></tr></thead><tbody id="links-body"></tbody></table></div>
+<nav class="table-pagination" aria-label="Phân trang URL"><button id="links-previous" class="secondary">← Trang trước</button><span id="links-page">Trang 1</span><button id="links-next" class="secondary">Trang sau →</button></nav>
+</section>
+</main><footer><span>HUST Discovery</span><span>Tự làm mới mỗi 10 giây · Chỉ thu thập dữ liệu công khai</span></footer>
+</body></html>

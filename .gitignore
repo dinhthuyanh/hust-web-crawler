@@ -23,3 +23,13 @@ target/
 # Crawled data and generated outputs
 data/*
 !data/.gitkeep
+.claude
+.agents
+.idea/*
+index
+/index
+/index/
+/data/
+/.idea/
+/hust-web-crawler/index/*
+/searcher/index

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HUST Search · Tra cứu tri thức</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/search.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/" aria-label="HUST Search trang chủ"><span class="brand-mark">H</span><span>HUST <strong>Search</strong></span></a><nav><a href="/crawler.html">Quản lý crawler →</a></nav></header>
+  <main>
+    <section class="intro"><p class="eyebrow">ĐẠI HỌC BÁCH KHOA HÀ NỘI</p><h1>Tìm thông tin.<br><span>Mở rộng hiểu biết.</span></h1><p class="lead">Tra cứu nội dung đã thu thập từ website HUST.<br>Tìm kiếm bằng tiếng Việt có dấu hoặc không dấu.</p></section>
+    <section class="search-panel" aria-label="Tìm kiếm">
+      <form id="search-form">
+        <label for="query" class="field-label">Bạn đang tìm gì?</label>
+        <div class="query-row"><input id="query" name="q" type="search" maxlength="500" required placeholder="Ví dụ: tuyển sinh đại học" autocomplete="off"><button type="submit" id="search-button">Tìm kiếm <span aria-hidden="true">↗</span></button></div>
+        <div class="options">
+          <label>Chế độ tìm kiếm<select id="mode" name="mode"><option value="BM25">Từ khóa</option><option value="BOOLEAN">Boolean</option><option value="PHRASE">Cụm từ chính xác</option><option value="FUZZY">Gần đúng</option><option value="PREFIX">Tiền tố</option></select></label>
+          <label>Xếp hạng<select id="ranking" name="ranking"><option value="BM25">BM25</option><option value="TFIDF">TF-IDF</option></select></label>
+          <label>Top-k<input id="top-k" type="number" min="1" max="10000" value="100" required aria-label="Top-k"></label><label>Kết quả mỗi trang<select id="size" name="size"><option value="10">10 kết quả</option><option value="20">20 kết quả</option><option value="50">50 kết quả</option></select></label>
+        </div>
+        <p class="help">Top-k là tổng số kết quả tốt nhất được giữ lại. Số kết quả mỗi trang chỉ dùng để phân trang trong tập này.</p><p id="mode-help" class="help"></p>
+        <div class="example-row"><span>Thử tìm:</span><button type="button" class="example" data-query="tuyển sinh">tuyển sinh</button><button type="button" class="example" data-query="học bổng">học bổng</button><button type="button" class="example" data-query="nghiên cứu">nghiên cứu</button></div>
+      </form>
+    </section>
+    <div id="message" role="status" aria-live="polite" hidden></div>
+    <section id="results-section" aria-label="Kết quả tìm kiếm" hidden>
+      <div class="results-heading"><h2>Kết quả tìm kiếm</h2><p id="results-meta" aria-live="polite"></p></div>
+      <div id="results" aria-busy="false"></div>
+      <nav id="pagination" aria-label="Phân trang" hidden><button id="previous" type="button">← Trang trước</button><span id="page-label"></span><button id="next" type="button">Trang sau →</button></nav>
+    </section>
+    <section class="index-panel" aria-label="Dữ liệu tìm kiếm"><div><p class="eyebrow">DỮ LIỆU TÌM KIẾM</p><p id="index-status">Đang kiểm tra chỉ mục…</p><p class="help">Sau khi crawler hoàn tất, cập nhật chỉ mục để tìm trong dữ liệu mới.</p></div><button id="rebuild" class="secondary" type="button">Cập nhật chỉ mục</button></section>
+  </main>
+  <footer><span>HUST Search</span><span>Tra cứu dữ liệu công khai · Apache Lucene</span></footer>
+  <template id="hit-template"><article class="hit"><div class="hit-top"><span class="hit-type"></span><span class="hit-score"></span></div><h3><a target="_blank" rel="noopener noreferrer"></a></h3><p class="hit-url"></p><p class="hit-snippet"></p></article></template>
+</body>
+</html>
