@@ -16,30 +16,27 @@ Dự án được chia thành các phần công việc chính:
 - HTML / CSS / JavaScript thuần trong `FE/`: giao diện crawler và tìm kiếm.
 - Python HTTP server: phục vụ FE, API crawler và proxy Java searcher.
 - JSON / JSONL / CSV / TXT: lưu trữ dữ liệu crawl.
-- Git và Git LFS: quản lý mã nguồn và các file dữ liệu lớn.
-- Apache Lucene (Java): indexing và search — phần cần tích hợp tiếp theo.
+- Git: chỉ quản lý source code; dữ liệu, index và output được ignore.
+- Java 21, Spring Boot 3 và Apache Lucene: lập chỉ mục và tìm kiếm.
 
 ## 3. Cấu trúc repository
 ```text
 hust-web-crawler/
-├── FE/                      # Toàn bộ HTML / CSS / JS
-├── searcher/                # Java API index/search
-├── app.py                   # Python gateway / API crawler
-├── crawler_hust.py
-├── content_extractor.py
-├── requirements.txt
-├── urls.txt
-├── .gitignore
-├── .gitattributes
-├── README.md
-└── data/
-    ├── content.json
-    ├── content.jsonl
-    ├── links.csv
-    ├── links.txt
-    ├── link_graph.csv
-    └── report.json
+├── FE/                      # HTML / CSS / JS thuần
+├── searcher/                # Source Java, pom.xml (target/ sinh khi build)
+├── input/                   # urls.txt tùy chọn; urls.example.txt làm mẫu
+├── data/                    # Nội dung crawl, checkpoint, báo cáo, log/PID
+├── index/                   # Lucene index tự sinh
+├── output/downloads/        # File tài liệu tải về
+├── tests/                   # Test Python
+├── app.py                   # Gateway / API crawler / phục vụ FE
+├── crawler_hust.py          # Crawl và trích xuất nội dung
+├── content_extractor.py     # Công cụ trích xuất riêng (tùy chọn)
+└── requirements.txt
 ```
+
+`data/`, `index/`, `output/` và `input/urls.txt` là dữ liệu local, không commit. Các thư mục đầu ra được tạo khi cần. `.venv/` là môi trường Python, `.idea/` là cấu hình IDE; không xóa khi đang dùng. Không còn index bên trong `searcher/` hoặc thư mục `hust-web-crawler/` lồng nhau.
+
 
 ## 4. Mô tả các file dữ liệu
 
@@ -65,35 +62,68 @@ Không nên mặc định mọi URL trong `links.csv` đều có nội dung đ�
 
 Đối với indexing, nên ưu tiên các bản ghi nội dung thực tế trong `content.jsonl`, đồng thời kiểm tra tính hợp lệ và loại trùng URL trước khi tạo chỉ mục.
 
-## 6. Chạy toàn bộ ứng dụng
+## 6. Chạy từ đầu khi chưa có dữ liệu
 
-Cần Python 3.10+, Java 21 và Maven. Không còn dùng Streamlit. Giao diện duy nhất nằm trong `FE/`; Java chỉ cung cấp API.
+Cần Python 3.10+, Java 21, Maven. Mở các terminal tại thư mục gốc repository. Không cần Node.js, Streamlit, Git LFS hay database.
 
-Từ thư mục gốc, Terminal 1:
+### Bước 1 — Cài thư viện Python (một lần)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python app.py
+cp input/urls.example.txt input/urls.txt
 ```
 
-Terminal 2:
+Có thể sửa `input/urls.txt`, mỗi dòng một URL trong domain `hust.edu.vn` hoặc `www.hust.edu.vn`. Nếu không có file, crawler mặc định bắt đầu từ `https://hust.edu.vn/`. Khi có `data/crawl_state.json`, crawler tiếp tục checkpoint cũ thay vì đọc lại seed.
+
+### Bước 2 — Chạy giao diện/gateway (Terminal 1)
 
 ```bash
-cd searcher
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-export PATH="$JAVA_HOME/bin:$PATH"
-mvn spring-boot:run
+.venv/bin/python app.py
 ```
 
-Mở **http://127.0.0.1:8000/** để tìm kiếm, hoặc **http://127.0.0.1:8000/crawler.html** để quản lý crawler. Java API chạy ở cổng 8080. Không mở HTML bằng `file://`.
+Mở http://127.0.0.1:8000/crawler.html, bấm **Bắt đầu**. Gateway tự chạy crawler bằng Python trong `.venv`. Không chạy thêm `crawler_hust.py` cùng lúc. Chờ crawl hoàn tất hoặc bấm **Dừng an toàn**, chờ trạng thái đã dừng để crawler ghi xong dữ liệu. Crawl toàn bộ website có thể kéo dài; có thể dừng để thử tìm kiếm trước.
 
-`app.py` dùng thư viện chuẩn Python, không cần dependency để hiển thị FE; các dependency trong `requirements.txt` dùng cho crawler/extractor. Crawler cần được dừng an toàn trước khi cập nhật chỉ mục. Crawler đang chạy sẽ không bị dừng khi đóng gateway.
+Crawler tự tạo `data/content.jsonl`, `data/crawl_state.json`, danh sách liên kết và báo cáo; tài liệu tải về nằm ở `output/downloads/`. Chỉ tài liệu có nội dung văn bản hợp lệ mới được index. Không bắt buộc chạy riêng `content_extractor.py` vì crawler đã trích xuất nội dung.
 
-Java tự rebuild khi khởi động. Lần đầu sau thay đổi này cần rebuild index để nạp JSONL và trường sắp xếp URL mới. Java tự tìm thư mục dự án từ working directory hoặc vị trí class/JAR; chạy từ IntelliJ tại thư mục gốc hoặc từ `searcher` đều dùng `data/` và `searcher/index/`. Có thể ghi đè bằng `DATA_DIR` và `INDEX_DIR`. Không sử dụng các thư mục index cũ bị tạo nhầm ở thư mục gốc.
+Nếu muốn crawl bằng terminal thay cho nút trên giao diện:
 
-Gateway bind `127.0.0.1:8000`, Java bind `127.0.0.1:8080`. Đổi cổng FE: `python app.py --port 8001`. Đổi địa chỉ Java upstream bằng `SEARCH_URL=http://127.0.0.1:8081 python app.py`. Đây là công cụ local; không công khai API điều khiển crawler ra Internet.
+```bash
+.venv/bin/python crawler_hust.py
+```
+
+Dùng Ctrl+C một lần rồi đợi lưu checkpoint/đầu ra xong.
+
+### Bước 3 — Chạy Java (Terminal 2)
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+mvn -f searcher/pom.xml spring-boot:run
+```
+
+Maven cần Internet lần đầu để tải dependency. Java chạy ở http://127.0.0.1:8080 và tự index dữ liệu hiện có vào `index/` ở root. Nếu chưa có dữ liệu, Java vẫn khởi động và trả 0 kết quả; có thể chạy Java trước bước crawl.
+
+Trong IntelliJ: chọn JDK 21, chạy `vn.edu.hust.searcher.SearcherApplication`. Xóa override `INDEX_DIR` / `DATA_DIR` và các tham số `--searcher.index-dir` / `--searcher.data-dir` cũ để dùng mặc định tự nhận diện root.
+
+### Bước 4 — Tìm kiếm
+
+Mở http://127.0.0.1:8000/, nhập từ khóa và chọn mode. Nếu Java đã chạy trước lúc crawl xong, bấm **Cập nhật chỉ mục**, hoặc:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/index/rebuild
+```
+
+Chỉ rebuild sau khi crawler đã dừng và ghi xong dữ liệu. Kiểm tra số tài liệu:
+
+```bash
+curl http://127.0.0.1:8000/api/index
+```
+
+Lần chạy sau chỉ cần chạy gateway và Java; chỉ chạy crawler khi cần thu thập thêm. Để crawl lại hoàn toàn, dừng crawler và Java rồi chuyển `data/`, `index/`, `output/` cũ sang nơi lưu trữ khác trước khi làm lại các bước trên. Không cần xóa source hoặc môi trường `.venv`.
+
+Gateway bind `127.0.0.1:8000`, Java bind `127.0.0.1:8080`. Đổi cổng FE bằng `python app.py --port 8001`, đổi Java upstream bằng `SEARCH_URL=http://127.0.0.1:8081 python app.py`. Đóng gateway không tự dừng crawler; dùng nút dừng trước khi đóng nếu cần.
 
 ## 7. Search và top-k
 

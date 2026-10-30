@@ -30,6 +30,26 @@ class SearchServiceTest {
     }
     @AfterEach void close() throws Exception { service.close(); }
 
+    @Test void startsWithoutDataAndCanIndexAfterCrawling() throws Exception {
+        Path freshData = temp.resolve("fresh-data");
+        Path freshIndex = temp.resolve("fresh-index");
+        try (var fresh = new SearchService(new ObjectMapper(), freshData.toString(), freshIndex.toString(), true)) {
+            fresh.init();
+            assertThat(fresh.status().get("documents")).isEqualTo(0);
+            assertThat(fresh.search("hoc", BM25, SearchService.Ranking.BM25, 0, 10).hits()).isEmpty();
+            assertThatThrownBy(fresh::rebuild).isInstanceOf(IllegalArgumentException.class);
+            Files.createDirectories(freshData);
+            Files.writeString(freshData.resolve("content.jsonl"),
+                    "{\"url\":\"https://hust.edu.vn/new\",\"content_text\":\"hoc bong\"}\n");
+            assertThat(fresh.rebuild().documents()).isEqualTo(1);
+        }
+        Files.delete(freshData.resolve("content.jsonl"));
+        try (var restarted = new SearchService(new ObjectMapper(), freshData.toString(), freshIndex.toString(), true)) {
+            restarted.init();
+            assertThat(restarted.status().get("documents")).isEqualTo(1);
+        }
+    }
+
     @Test void readsBothSchemasAndDeduplicates() throws Exception {
         assertThat(service.rebuild().documents()).isEqualTo(3);
         assertThat(service.rebuild().skipped()).isEqualTo(3);

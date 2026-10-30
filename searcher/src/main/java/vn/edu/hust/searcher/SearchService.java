@@ -44,7 +44,7 @@ public class SearchService implements AutoCloseable {
         Path workingDirectory = Path.of("").toAbsolutePath();
         Path applicationLocation = SearchPaths.applicationLocation();
         this.dataPath = SearchPaths.resolve(dataDir, "data", workingDirectory, applicationLocation);
-        this.indexPath = SearchPaths.resolve(indexDir, "searcher/index", workingDirectory, applicationLocation);
+        this.indexPath = SearchPaths.resolve(indexDir, "index", workingDirectory, applicationLocation);
         this.indexOnStartup = indexOnStartup;
     }
 
@@ -60,7 +60,15 @@ public class SearchService implements AutoCloseable {
             }
         }
         manager = new SearcherManager(directory, null);
-        if (indexOnStartup) rebuild();
+        if (indexOnStartup) {
+            if (Files.isRegularFile(dataPath.resolve("content.jsonl"))
+                    || Files.isRegularFile(dataPath.resolve("content.json"))) {
+                rebuild();
+            } else {
+                org.slf4j.LoggerFactory.getLogger(SearchService.class)
+                        .info("No crawl content yet; keeping current index. Crawl first, then POST /api/index/rebuild.");
+            }
+        }
     }
 
     /** Rebuild in one commit; on failure the previous committed snapshot survives. */

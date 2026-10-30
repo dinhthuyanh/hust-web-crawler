@@ -1,6 +1,6 @@
 # HUST Searcher
 
-Module độc lập Java 21 + Spring Boot 3.5.16 + Apache Lucene 9.12.2. Không cần database hoặc Elasticsearch. Python crawler giữ nguyên; module chỉ đọc dữ liệu nguồn và ghi Lucene index vào `searcher/index`.
+Module độc lập Java 21 + Spring Boot 3.5.16 + Apache Lucene 9.12.2. Không cần database hoặc Elasticsearch. module chỉ đọc dữ liệu nguồn và ghi Lucene index vào `index/` ở root.
 
 ## Chạy trên macOS
 
@@ -15,7 +15,7 @@ mvn test
 mvn spring-boot:run
 ```
 
-Lần đầu Maven cần Internet để tải dependency. Java API mặc định nghe tại `http://localhost:8080`, chỉ bind loopback; giao diện nằm trong `../FE` và được phục vụ bởi `python app.py` tại cổng 8000. Tự lập lại chỉ mục khi khởi động. Nhấn Ctrl+C để dừng.
+Lần đầu Maven cần Internet để tải dependency. Java API mặc định nghe tại `http://localhost:8080`, chỉ bind loopback; giao diện nằm trong `../FE` và được phục vụ bởi `python app.py` tại cổng 8000. Tự lập lại chỉ mục khi khởi động nếu có dữ liệu; nếu chưa có nguồn thì giữ index hiện tại (index rỗng trong lần chạy đầu). Nhấn Ctrl+C để dừng.
 
 Hoặc đóng gói:
 
@@ -30,7 +30,7 @@ java -jar target/searcher-1.0.0.jar
 DATA_DIR=/absolute/path/to/data INDEX_DIR=/absolute/path/to/index java -jar /absolute/path/to/searcher-1.0.0.jar
 ```
 
-Biến môi trường: `DATA_DIR` (mặc định `auto` → `<project>/data`), `INDEX_DIR` (`auto` → `<project>/searcher/index`), `PORT` (`8080`), `INDEX_ON_STARTUP` (`true`). Chỉ chạy một instance trên cùng thư mục index.
+Biến môi trường: `DATA_DIR` (mặc định `auto` → `<project>/data`), `INDEX_DIR` (`auto` → `<project>/index`), `PORT` (`8080`), `INDEX_ON_STARTUP` (`true`). Chỉ chạy một instance trên cùng thư mục index.
 
 ## Đầu vào và lập chỉ mục
 
@@ -125,3 +125,5 @@ Toàn bộ giao diện đã chuyển ra `../FE/` (HTML/CSS/JS thuần); không c
 Chạy main class `vn.edu.hust.searcher.SearcherApplication`, dùng JDK 21. Working directory có thể là thư mục gốc `hust-web-crawler` hoặc module `searcher`; mặc định `auto` xác định cùng một thư mục dữ liệu và index ở cả hai trường hợp. Sau khi cập nhật source, bấm Build → Rebuild Project rồi Run/Debug lại.
 
 Nếu Run Configuration còn khai báo `DATA_DIR=../data` hoặc `--searcher.data-dir=../data`, bỏ cấu hình cũ để dùng tự nhận diện hoặc đặt đường dẫn tuyệt đối. Đường dẫn tự khai báo luôn được tính theo working directory. Khi mang riêng JAR ra ngoài repo, khai báo cả `DATA_DIR` và `INDEX_DIR` thành đường dẫn tuyệt đối.
+
+Quy trình từ dữ liệu rỗng: xem [README gốc](../README.md#6-chạy-từ-đầu-khi-chưa-có-dữ-liệu). Crawl xong mới rebuild; Java có thể khởi động trước crawler.

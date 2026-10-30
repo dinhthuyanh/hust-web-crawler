@@ -19,3 +19,8 @@ __pycache__/
 /data/
 **/index/
 **/target/
+
+# Local input and generated downloads
+/input/*
+!/input/urls.example.txt
+/output/

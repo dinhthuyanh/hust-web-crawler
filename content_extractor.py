@@ -22,7 +22,7 @@ from bs4.element import Tag
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
-DOWNLOAD_DIR = DATA_DIR / "downloads"
+DOWNLOAD_DIR = BASE_DIR / "output" / "downloads"
 
 CONTENT_FILE = DATA_DIR / "content.json"
 LINK_GRAPH_FILE = DATA_DIR / "link_graph.csv"
@@ -531,7 +531,7 @@ def extract_html(url: str) -> dict[str, Any]:
 # ============================================================
 
 def download_file(url: str) -> dict[str, Any]:
-    """Tai tep cong khai ve data/downloads."""
+    """Tai tep cong khai ve output/downloads."""
     url = normalize_url(url)
 
     result: dict[str, Any] = {

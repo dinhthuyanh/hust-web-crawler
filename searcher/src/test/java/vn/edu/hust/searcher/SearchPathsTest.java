@@ -20,13 +20,15 @@ class SearchPathsTest {
         Path root = repository();
         Path classes = root.resolve("searcher/target/classes");
         assertThat(SearchPaths.resolve("auto", "data", root, classes)).isEqualTo(root.resolve("data"));
-        assertThat(SearchPaths.resolve("auto", "searcher/index", root, classes)).isEqualTo(root.resolve("searcher/index"));
+        assertThat(SearchPaths.resolve("auto", "index", root, classes)).isEqualTo(root.resolve("index"));
     }
 
     @Test void mavenWorkingDirectoryAtModule() throws Exception {
         Path root = repository();
         assertThat(SearchPaths.resolve("auto", "data", root.resolve("searcher"), root.resolve("searcher/target/classes")))
                 .isEqualTo(root.resolve("data"));
+        assertThat(SearchPaths.resolve("auto", "index", root.resolve("searcher"), root.resolve("searcher/target/classes")))
+                .isEqualTo(root.resolve("index"));
     }
 
     @Test void jarLaunchedFromUnrelatedDirectory() throws Exception {
@@ -37,7 +39,7 @@ class SearchPathsTest {
 
     @Test void explicitOverridesAreNotReinterpreted() {
         assertThat(SearchPaths.resolve("custom-data", "data", temp, temp)).isEqualTo(temp.resolve("custom-data"));
-        assertThat(SearchPaths.resolve(temp.resolve("external-index").toString(), "searcher/index", temp, temp))
+        assertThat(SearchPaths.resolve(temp.resolve("external-index").toString(), "index", temp, temp))
                 .isEqualTo(temp.resolve("external-index"));
     }
 

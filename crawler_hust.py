@@ -27,8 +27,8 @@ except Exception:
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
-DOWNLOAD_DIR = DATA_DIR / "downloads"
-SEED_FILE = BASE_DIR / "urls.txt"
+DOWNLOAD_DIR = BASE_DIR / "output" / "downloads"
+SEED_FILE = BASE_DIR / "input" / "urls.txt"
 LINKS_TXT = DATA_DIR / "links.txt"
 LINKS_CSV = DATA_DIR / "links.csv"
 GRAPH_CSV = DATA_DIR / "link_graph.csv"
